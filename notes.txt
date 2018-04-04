@@ -1,0 +1,8 @@
+Incoming has a quantity and shelf life.
+Incoming should be dedicated to fulfill outgoing if there isn't enough existing, fresh product (credits) to cover it.
+Entry should have knowledge of existing credits.
+Entry should always use credits to fulfill outgoing when possible.
+If an entry absolutely needs credits to fulfill its outgoing it should make previous entries aware of that (debits).
+This can lead to a cascading pattern (debits creating debits creating debits...).
+Credits do not cascade.
+Do not debit a previous entry into negative availability.
