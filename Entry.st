@@ -1,32 +1,22 @@
 Object subclass: Entry [
-  | index incoming outgoing credits debits debit |
-  Entry class >> new: idx [
+  | available incoming outgoing under |
+  Entry class >> new [
     <category: 'instance creation'>
     | r |
     r := super new.
-    r init: idx.
+    r init.
     ^r
   ]
-  init: idx [
+  init [
     <category: 'initialization'>
-    index := idx.
+    available := 0.
     incoming := 0.
     outgoing := 0.
-    credits := Dictionary new.
-    debits := Dictionary new.
-    debit := self debit
+    under := 0
   ]
-  index [
+  available [
     <category: 'accessing'>
-    ^index
-  ]
-  credits [
-    <category: 'accessing'>
-    ^credits
-  ]
-  debits [
-    <category: 'accessing'>
-    ^debits
+    ^available
   ]
   incoming [
     <category: 'accessing'>
@@ -36,64 +26,57 @@ Object subclass: Entry [
     <category: 'accessing'>
     ^outgoing
   ]
-  credit [
+  isUnder [
     <category: 'accessing'>
-    ^((self available) max: 0) min: incoming
+    ^under > 0
   ]
-  debit [
-    <category: 'accessing'>
-    ^debit
+  diff [
+    under := 0 max: (under + outgoing - incoming).
   ]
-  beginCredit [
-    <category: 'accessing'>
-    ^(self credit) > 0
-  ]
-  beginDebit [
-    <category: 'accessing'>
-    debit := ((outgoing - incoming + (self sumDebits)) max: 0) min: outgoing.
-    ^debit > 0
-  ]
-  endDebit [
-    <category: 'accessing'>
-    ^debit = 0
-  ]
-  sumCredits [
-    <category: 'accessing'>
-    ^credits inject: 0 into: [:sum :each | sum + each ]
-  ]
-  sumDebits [
-    <category: 'accessing'>
-    ^debits inject: 0 into: [:sum :each | sum + each ]
-  ]
-  available [
-    <category: 'accessing'>
-    ^incoming - outgoing + (self sumCredits) - (self sumDebits)
-  ]
-  deduct: x [
-    debit := debit - x.
-    ^x
+  debit: x [
+    available := available - x.
+    under := under + x
   ]
   fulfill: e [
-    ^self deduct: ((0 max: (e available)) min: debit)
+    | x |
+    x := under min: ((e incoming) min: (0 max: (e available))).
+    (x > 0)
+      ifTrue: [
+        under := under - x.
+        e debit: x
+      ]
   ]
-  debit: e [
-    ^debits at: (e index) put: (e fulfill: self)
-  ]
-  credit: e [
-    ^credits at: (e index) put: (e credit)
+  products: products shelflife: shelflife [
+    | i |
+    available := available - outgoing.
+    products add: (Product new: incoming).
+    products sortBlock: [ :a :b | (a age) > (b age) ].
+    i := 0.
+    [(available < 0) & (i <= (products size))]
+      whileTrue: [
+        i := i + 1.
+        available := available + ((products at: i) use: (available abs))
+      ].
+    i := i max: 1.
+    [i <= (products size)]
+      whileTrue: [
+        available := available + (products at: i) quantity.
+        i := i + 1
+      ].
+    ^products select: [ :p | (p hasQuantity) & (p isFresh: shelflife) ]
   ]
   incoming: x [
     (x < 0)
-      ifTrue: [self error: 'incoming cannot be less than zero']
-      ifFalse: [incoming := x]
+      ifTrue: [^self error: 'incoming cannot be less than zero'].
+    incoming := x
   ]
   outgoing: x [
     (x < 0)
-      ifTrue: [self error: 'outgoing cannot be less than zero']
-      ifFalse: [outgoing := x]
+      ifTrue: [^self error: 'outgoing cannot be less than zero'].
+    outgoing := x
   ]
   printOn: stream [
     <category: 'printing'>
-    stream nextPutAll: 'Entry{in=', (incoming asString), ',out=', (outgoing asString), ',cred=', (self sumCredits asString), ',deb=', (self sumDebits asString), ',av=', (self available asString), '}'
+    stream nextPutAll: 'Entry{in=', (incoming asString), ',out=', (outgoing asString), ',av=', (available asString), '}'.
   ]
 ]

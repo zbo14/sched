@@ -1,5 +1,5 @@
 Object subclass: Schedule [
-  | entries shelflife |
+  | entries products shelflife |
   Schedule class >> new: size [
     <category: 'instance creation'>
     | r |
@@ -9,8 +9,31 @@ Object subclass: Schedule [
   ]
   init: size [
     <category: 'initialization'>
-    entries := (1 to: size) collect: [ :idx | Entry new: idx ].
+    entries := (1 to: size) collect: [ :i | Entry new ].
     shelflife := 1
+  ]
+  available [
+    <category: 'accessing'>
+    ^entries collect: [ :e | e available ]
+  ]
+  run [
+    products := SortedCollection new.
+    entries do: [ :e |
+      products := e products: products shelflife: shelflife.
+    ].
+    (entries size to: 1 by: -1) do: [ :i |
+      | j |
+      j := i - 1.
+      (entries at: i) diff.
+      [(j > 0) & ((self reach: j) >= i) & ((entries at: i) isUnder)]
+        whileTrue: [
+          (entries at: i) fulfill: (entries at: j).
+          j := j - 1
+        ].
+    ]
+  ]
+  reach: i [
+    ^(entries size) min: (i - 1 + shelflife)
   ]
   checkQuantity: x [
     (x < 0)
@@ -20,50 +43,23 @@ Object subclass: Schedule [
     (i > 0)
       ifFalse: [^self error: 'index must be greater than zero'].
     (i > entries size)
-      ifTrue: [^self error: 'index must be less than/equal to number of entries'].
+      ifTrue: [^self error: 'index must be less than/equal to number of entries']
   ]
-  reach: i [
-    ^(entries size) min: (i - 1 + shelflife)
-  ]
-  credit: i [
-    ((entries at: i) beginCredit)
-      ifTrue: [
-        ((i + 1) to: (self reach: i)) do: [ :j |
-          (entries at: j) credit: (entries at: i)
-        ]
-      ]
-  ]
-  debit: i at: j [
-    ((j = 0) | ((entries at: i) endDebit))
-      ifTrue: [^self debit: (i - 1)].
-    (entries at: j) debit: (entries at: i).
-    ^self debit: i at: (j - 1)
-  ]
-  debit: i [
-    (i = 1)
-      ifTrue: [^nil].
-    ((entries at: i) beginDebit)
-      ifTrue: [^self debit: i at: (i - 1)].
-    ^self debit: (i - 1)
+  incoming: x outgoing: y at: i [
+    self incoming: x at: i; outgoing: y at: i
   ]
   incoming: x at: i [
-    self checkIndex: i.
-    self checkQuantity: x.
-    (entries at: i) incoming: x.
-    self credit: i.
-    self debit: i
+    self checkIndex: i; checkQuantity: x.
+    (entries at: i) incoming: x
   ]
   outgoing: x at: i [
-    self checkIndex: i.
-    self checkQuantity: x.
-    (entries at: i) outgoing: x.
-    self credit: i.
-    self debit: i
+    self checkIndex: i; checkQuantity: x.
+    (entries at: i) outgoing: x
   ]
   shelflife: shelf [
-    (shelf > 0)
-      ifTrue: [shelflife := shelf]
-      ifFalse: [self error: 'shelf life must be greater than zero']
+    (shelf <= 0)
+      ifTrue: [^self error: 'shelf life must be greater than zero'].
+    shelflife := shelf
   ]
   printOn: stream [
     <category: 'printing'>
