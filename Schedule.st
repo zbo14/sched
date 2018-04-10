@@ -12,25 +12,40 @@ Object subclass: Schedule [
     entries := (1 to: size) collect: [ :i | Entry new ].
     shelflife := 1
   ]
+  clear [
+    entries do: [ :e | e clear ]
+  ]
+  clear: i [
+    self checkIndex: i.
+    (entries at: i) clear
+  ]
   available [
     <category: 'accessing'>
     ^entries collect: [ :e | e available ]
   ]
-  run [
+  available: i to: j [
+    ^self available copyFrom: i to: j
+  ]
+  calculateAvailable [
+    | j x |
     products := SortedCollection new.
     entries do: [ :e |
-      products := e products: products shelflife: shelflife.
+      products := e products: products shelflife: shelflife
     ].
     (entries size to: 1 by: -1) do: [ :i |
-      | j |
       j := i - 1.
       (entries at: i) diff.
       [(j > 0) & ((self reach: j) >= i) & ((entries at: i) isUnder)]
         whileTrue: [
-          (entries at: i) fulfill: (entries at: j).
+          x := (entries at: i) fulfill: (entries at: j).
+          ((j + 1) to: (i - 1)) do: [ :k | (entries at: k) deduct: x ].
           j := j - 1
-        ].
-    ]
+        ]
+    ].
+    ^self available
+  ]
+  calculateAvailable: i to: j [
+    ^self calculateAvailable copyFrom: i to: j
   ]
   reach: i [
     ^(entries size) min: (i - 1 + shelflife)

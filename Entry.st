@@ -9,9 +9,8 @@ Object subclass: Entry [
   ]
   init [
     <category: 'initialization'>
+    self clear.
     available := 0.
-    incoming := 0.
-    outgoing := 0.
     under := 0
   ]
   available [
@@ -26,6 +25,9 @@ Object subclass: Entry [
     <category: 'accessing'>
     ^outgoing
   ]
+  clear [
+    self incoming: 0; outgoing: 0
+  ]
   isUnder [
     <category: 'accessing'>
     ^under > 0
@@ -37,28 +39,33 @@ Object subclass: Entry [
     available := available - x.
     under := under + x
   ]
+  deduct: x [
+    available := 0 max: available - x.
+  ]
   fulfill: e [
     | x |
-    x := under min: ((e incoming) min: (0 max: (e available))).
+    x := under min: (e incoming min: (0 max: e available)).
     (x > 0)
       ifTrue: [
         under := under - x.
         e debit: x
-      ]
+      ].
+    ^x
   ]
   products: products shelflife: shelflife [
     | i |
-    available := available - outgoing.
+    available := 0 - outgoing.
+    under := 0.
     products add: (Product new: incoming).
     products sortBlock: [ :a :b | (a age) > (b age) ].
     i := 0.
-    [(available < 0) & (i <= (products size))]
+    [(available < 0) & (i < products size)]
       whileTrue: [
         i := i + 1.
-        available := available + ((products at: i) use: (available abs))
+        available := available + ((products at: i) use: available abs)
       ].
     i := i max: 1.
-    [i <= (products size)]
+    [i <= products size]
       whileTrue: [
         available := available + (products at: i) quantity.
         i := i + 1
@@ -77,6 +84,6 @@ Object subclass: Entry [
   ]
   printOn: stream [
     <category: 'printing'>
-    stream nextPutAll: 'Entry{in=', (incoming asString), ',out=', (outgoing asString), ',av=', (available asString), '}'.
+    stream nextPutAll: 'Entry{in=', (incoming asString), ',out=', (outgoing asString), ',av=', (available asString), ',under=', (under asString), '}'.
   ]
 ]
