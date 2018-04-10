@@ -1,3 +1,5 @@
+FileStream fileIn: 'Entry.st'.
+
 Object subclass: Schedule [
   | entries products shelflife |
   Schedule class >> new: size [
@@ -52,13 +54,22 @@ Object subclass: Schedule [
   ]
   checkQuantity: x [
     (x < 0)
-      ifTrue: [^self error: 'quantity cannot be less than zero']
+      ifTrue: [
+        ^SystemExceptions.InvalidValue signalOn: x
+          reason: 'quantity cannot be less than zero'
+      ]
   ]
   checkIndex: i [
     (i > 0)
-      ifFalse: [^self error: 'index must be greater than zero'].
+      ifFalse: [
+        ^SystemExceptions.InvalidValue signalOn: i
+          reason: 'index must be greater than zero'
+      ].
     (i > entries size)
-      ifTrue: [^self error: 'index must be less than/equal to number of entries']
+      ifTrue: [
+        ^SystemExceptions.InvalidValue signalOn: i
+          reason: 'index must be less than/equal to number of entries'
+      ]
   ]
   incoming: x outgoing: y at: i [
     self incoming: x at: i; outgoing: y at: i
@@ -73,7 +84,10 @@ Object subclass: Schedule [
   ]
   shelflife: shelf [
     (shelf <= 0)
-      ifTrue: [^self error: 'shelf life must be greater than zero'].
+      ifTrue: [
+        ^SystemExceptions.InvalidValue signalOn: shelf
+          reason: 'shelf life must be greater than zero'
+      ].
     shelflife := shelf
   ]
   printOn: stream [

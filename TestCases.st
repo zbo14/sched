@@ -1,4 +1,5 @@
 PackageLoader fileInPackage: 'SUnit'.
+FileStream fileIn: 'Schedule.st'.
 
 TestCase subclass: SchedTestCase [
   | s |
@@ -102,5 +103,26 @@ TestCase subclass: SchedTestCase [
     self should: [
       (s calculateAvailable: 1 to: 4) = #(0 0 -1 1)
     ]
+  ]
+  invalidValue: x reason: r block: aBlock [
+    aBlock on: SystemExceptions.InvalidValue do: [ :signal |
+      self should: [x = signal value].
+      self should: [r = signal messageText]
+    ]
+  ]
+  exceptions [
+    s := Schedule new: 10.
+    self invalidValue: 0
+      reason: 'Invalid value 0: shelf life must be greater than zero'
+      block: [s shelflife: 0].
+    self invalidValue: 0
+      reason: 'Invalid value 0: index must be greater than zero'
+      block: [s incoming: 1 at: 0].
+    self invalidValue: 11
+      reason: 'Invalid value 11: index must be less than/equal to number of entries'
+      block: [s outgoing: 1 at: 11].
+    self invalidValue: -1
+      reason: 'Invalid value -1: quantity cannot be less than zero'
+      block: [s incoming: -1 at: 1]
   ]
 ]

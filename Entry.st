@@ -1,3 +1,5 @@
+FileStream fileIn: 'Product.st'.
+
 Object subclass: Entry [
   | available incoming outgoing under |
   Entry class >> new [
@@ -73,13 +75,9 @@ Object subclass: Entry [
     ^products select: [ :p | (p hasQuantity) & (p isFresh: shelflife) ]
   ]
   incoming: x [
-    (x < 0)
-      ifTrue: [^self error: 'incoming cannot be less than zero'].
     incoming := x
   ]
   outgoing: x [
-    (x < 0)
-      ifTrue: [^self error: 'outgoing cannot be less than zero'].
     outgoing := x
   ]
   printOn: stream [

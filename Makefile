@@ -4,11 +4,11 @@ PACKAGE_DIR = ~/.st
 PACKAGE_SPEC = package.xml
 PACKAGE_FILE = $(PACKAGE_DIR)/sched.star
 PACKAGE_SRC = \
-	Product.st \
-	Entry.st \
-	Schedule.st \
-	Test.st \
-	TestCases.st
+  Product.st \
+  Entry.st \
+  Schedule.st \
+  Test.st \
+  TestCases.st
 
-$(PACKAGE_FILE):	$(PACKAGE_SRC) $(PACKAGE_SPEC)
+$(PACKAGE_FILE): $(PACKAGE_SRC) $(PACKAGE_SPEC)
 	gst-package -t ~/.st $(PACKAGE_SPEC)

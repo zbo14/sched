@@ -1,13 +1,7 @@
 <package>
   <name>sched</name>
-  <filein>Product.st</filein>
-  <filein>Entry.st</filein>
   <filein>Schedule.st</filein>
   <filein>Test.st</filein>
-  <filein>TestCases.st</filein>
-  <file>Product.st</file>
-  <file>Entry.st</file>
   <file>Schedule.st</file>
   <file>Test.st</file>
-  <file>TestCases.st</file>
 </package>
