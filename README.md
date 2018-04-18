@@ -5,7 +5,7 @@ Calculate available inventory from schedule of incoming/outgoing orders and prod
 
 ## Install
 
-First make sure you have [GNU Smalltalk](ftp://ftp.gnu.org/gnu/smalltalk) installed, then clone the repo and `make`.
+First make sure you have [GNU Smalltalk](http://smalltalk.gnu.org/download) installed, then clone the repo and `make`.
 
 ## Usage
 Run `gst` and execute the following:
