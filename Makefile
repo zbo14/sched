@@ -6,9 +6,7 @@ PACKAGE_FILE = $(PACKAGE_DIR)/sched.star
 PACKAGE_SRC = \
   Product.st \
   Entry.st \
-  Schedule.st \
-  Test.st \
-  TestCases.st
+  Schedule.st
 
 $(PACKAGE_FILE): $(PACKAGE_SRC) $(PACKAGE_SPEC)
 	gst-package -t ~/.st $(PACKAGE_SPEC)

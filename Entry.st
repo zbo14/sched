@@ -82,6 +82,6 @@ Object subclass: Entry [
   ]
   printOn: stream [
     <category: 'printing'>
-    stream nextPutAll: 'Entry{in=', (incoming asString), ',out=', (outgoing asString), ',av=', (available asString), ',under=', (under asString), '}'.
+    stream nextPutAll: 'Entry{in=', (incoming asString), ',out=', (outgoing asString), ',av=', (available asString), '}'.
   ]
 ]

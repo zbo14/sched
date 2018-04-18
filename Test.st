@@ -1,6 +1,6 @@
 FileStream fileIn: 'TestCases.st'.
 
-Eval [
-  (SchedTestCase selector: #calculateAvailable) run.
-  (SchedTestCase selector: #exceptions) run
-]
+(TestSuite named: 'sched')
+  addTest: (SchedTestCase selector: #calculateAvailable);
+  addTest: (SchedTestCase selector: #exceptions);
+  run

@@ -1,7 +1,9 @@
 <package>
   <name>sched</name>
+  <filein>Entry.st</filein>
+  <filein>Product.st</filein>
   <filein>Schedule.st</filein>
-  <filein>Test.st</filein>
+  <file>Entry.st</file>
+  <file>Product.st</file>
   <file>Schedule.st</file>
-  <file>Test.st</file>
 </package>
